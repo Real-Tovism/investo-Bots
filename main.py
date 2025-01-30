@@ -1,15 +1,21 @@
 import gspread
+import json
+import os
 from oauth2client.service_account import ServiceAccountCredentials
 
 # تنظیم دسترسی‌ها
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# خواندن اطلاعات سرویس‌اکانت از فایل JSON
-creds = ServiceAccountCredentials.from_json_keyfile_name("serene-broker-449408-a4-44be75670742.json", scope)
+# خواندن JSON از متغیر محیطی
+json_creds = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
+creds_dict = json.loads(json_creds)
+
+# احراز هویت با گواهی‌نامه
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 
 # باز کردن شیت مورد نظر
-spreadsheet = client.open("InvestoBots Data")  # نام فایل اکسل که توی گوگل شیت ساختی
+spreadsheet = client.open("InvestoBots Data")  # نام شیت گوگل که ساختی
 worksheet = spreadsheet.sheet1  # اولین شیت رو انتخاب می‌کنه
 
 # دریافت داده‌ها
