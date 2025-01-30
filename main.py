@@ -1,23 +1,24 @@
 import gspread
-import json
-import os
 from oauth2client.service_account import ServiceAccountCredentials
 
-# تنظیم دسترسی‌ها
+# تعریف اسکوپ‌های API
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# خواندن JSON از متغیر محیطی
-json_creds = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
-creds_dict = json.loads(json_creds)
+# آدرس فایل JSON که از Google Cloud Console دانلود کردی
+creds = ServiceAccountCredentials.from_json_keyfile_name("serene-broker-449408-a4-44be75670742.json", scope)
 
-# احراز هویت با گواهی‌نامه
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+# اتصال به API
 client = gspread.authorize(creds)
 
-# باز کردن شیت مورد نظر
-spreadsheet = client.open("InvestoBots Data")  # نام شیت گوگل که ساختی
-worksheet = spreadsheet.sheet1  # اولین شیت رو انتخاب می‌کنه
+# باز کردن شیت
+sheet = client.open("InvestoBotsIdeaChecker").sheet1  # اگر شیت چند برگه داره، از `sheet1`, `sheet2` و ... استفاده کن
 
-# دریافت داده‌ها
-data = worksheet.get_all_records()
-print(data)
+# خواندن همه داده‌ها
+data = sheet.get_all_records()
+print("Current data in sheet:", data)
+
+# نوشتن یک مقدار جدید در اولین ردیف خالی
+new_idea = ["New Video Idea", "This is a test idea"]
+sheet.append_row(new_idea)
+
+print("✅ Data successfully written to the sheet!")
